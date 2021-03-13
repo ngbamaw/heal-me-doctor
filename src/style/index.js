@@ -5,7 +5,7 @@ const App = styled.div`
     width: 100%;
     .discussion-section {
         display: flex;
-        height: 80%;
+        height: 75%;
         justify-content: flex-end;
         flex-direction: column;
     }
@@ -29,18 +29,27 @@ const App = styled.div`
         margin-bottom: 10px;
     }
     .message-choices {
-        height: 20%;
-        background-color: darkgray;
+        height: 25%;
         display: flex;
         .list-messages {
             width: 80%;
+            height: fit-content;
+            margin: auto 0;
         }
         .choice {
             padding: 10px;
             width: fit-content;
-            background-color: blue;
+            background-color: white;
+            border: 1px solid black;
             border-radius: 20px;
             margin-left: 10px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            &.selected {
+                background-color: aqua;
+                color: white;
+                border-color: aqua;
+            }
         }
         .send-btn {
             height: 50px;
