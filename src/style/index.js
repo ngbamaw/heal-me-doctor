@@ -50,6 +50,9 @@ const App = styled.div`
             background-color: #2196f3;
             display: flex;
             align-self: flex-end;
+            margin-left: auto;
+            margin-right: 10px;
+            margin-bottom: 10px;
             img {
                 height: 55%;
                 width: 55%;
