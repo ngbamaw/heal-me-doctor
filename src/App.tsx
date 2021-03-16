@@ -2,6 +2,11 @@ import React from 'react';
 import Style from './style';
 import SendIcon from './assets/send-icon.png';
 
+interface Message {
+    author: string;
+    text: string;
+}
+
 const ReceiverMessage: React.FC<{ children: string }> = ({ children }) => (
     <div className="message receiver">
         <p>{children}</p>
@@ -17,22 +22,32 @@ const MeMessage: React.FC<{ children: string }> = ({ children }) => (
 const App: React.FC = () => {
     const [choice, setChoice] = React.useState<number>(-1);
     const listChoice = ['Good bye', 'Go back', 'Hey !'];
+    const [messageList, setMessageList] = React.useState<Message[]>([
+        { author: 'receiver', text: 'Hello sir' },
+        { author: 'me', text: 'Hello, you' },
+        {
+            author: 'me',
+            text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
+        commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat Lorem
+        ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
+        commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat Lorem
+        ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
+        commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat Lorem
+        ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
+        commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat`,
+        },
+    ]);
 
     return (
         <Style>
             <div className="discussion-section">
-                <ReceiverMessage>Hello sir</ReceiverMessage>
-                <MeMessage>Hello, you</MeMessage>
-                <MeMessage>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
-                    commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat Lorem
-                    ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
-                    commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat Lorem
-                    ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
-                    commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat Lorem
-                    ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
-                    commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat
-                </MeMessage>
+                {messageList.map(({ author, text }) =>
+                    author === 'me' ? (
+                        <MeMessage>{text}</MeMessage>
+                    ) : (
+                        <ReceiverMessage>{text}</ReceiverMessage>
+                    ),
+                )}
             </div>
             <div className="message-choices">
                 <div className="list-messages">
@@ -46,7 +61,13 @@ const App: React.FC = () => {
                         </button>
                     ))}
                 </div>
-                <button className="send-btn" type="button">
+                <button
+                    className="send-btn"
+                    onClick={() =>
+                        setMessageList([...messageList, { author: 'me', text: listChoice[choice] }])
+                    }
+                    type="button"
+                >
                     <img src={SendIcon} alt="send" />
                 </button>
             </div>
