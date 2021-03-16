@@ -15,6 +15,9 @@ const MeMessage: React.FC<{ children: string }> = ({ children }) => (
 );
 
 const App: React.FC = () => {
+    const [choice, setChoice] = React.useState<number>(-1);
+    const listChoice = ['Good bye', 'Go back', 'Hey !'];
+
     return (
         <Style>
             <div className="discussion-section">
@@ -33,9 +36,15 @@ const App: React.FC = () => {
             </div>
             <div className="message-choices">
                 <div className="list-messages">
-                    <div className="choice selected">
-                        <p>Good bye</p>
-                    </div>
+                    {listChoice.map((value, index) => (
+                        <button
+                            type="button"
+                            className={`choice ${index === choice && 'selected'}`}
+                            onClick={() => setChoice(index)}
+                        >
+                            <p>{value}</p>
+                        </button>
+                    ))}
                 </div>
                 <button className="send-btn" type="button">
                     <img src={SendIcon} alt="send" />
