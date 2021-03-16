@@ -45,10 +45,18 @@ const App = styled.div`
             margin-left: 10px;
             margin-top: 5px;
             margin-bottom: 5px;
+            display: flex;
+            transition: all 0.5s;
+            outline: none;
             &.selected {
                 background-color: aqua;
                 color: white;
                 border-color: aqua;
+                box-shadow: transparent 0 0 0 !important;
+            }
+            &:focus,
+            &:hover {
+                box-shadow: aqua 0px 0px 15px;
             }
         }
         .send-btn {
