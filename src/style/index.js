@@ -8,12 +8,16 @@ const App = styled.div`
         height: 75%;
         justify-content: flex-end;
         flex-direction: column;
+        position: relative;
     }
     .message {
         padding: 10px 15px;
         width: fit-content;
         border-radius: 20px;
         max-width: 70%;
+    }
+    .message:last-of-type {
+        margin-bottom: 30px;
     }
     .me {
         background-color: #2196f3;
@@ -27,6 +31,12 @@ const App = styled.div`
         align-self: auto;
         margin-left: 10px;
         margin-bottom: 10px;
+    }
+
+    .pending-info {
+        position: absolute;
+        right: 10px;
+        bottom: 0;
     }
     .message-choices {
         height: 25%;
