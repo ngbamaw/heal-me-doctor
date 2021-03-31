@@ -37,6 +37,7 @@ const App: React.FC = () => {
         commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat`,
         },
     ]);
+    const [responseWriting, setResponseWriting] = React.useState<boolean>(false);
 
     return (
         <Style>
@@ -48,6 +49,7 @@ const App: React.FC = () => {
                         <ReceiverMessage>{text}</ReceiverMessage>
                     ),
                 )}
+                {responseWriting && <p className="pending-info">...Receiver writing</p>}
             </div>
             <div className="message-choices">
                 <div className="list-messages">
