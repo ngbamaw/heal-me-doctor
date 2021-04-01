@@ -3,6 +3,23 @@ import styled from 'styled-components';
 const App = styled.div`
     height: 100%;
     width: 100%;
+    .presentation-screen {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        display: flex;
+        background-image: url(http://localhost/imgs/heal-me-doctor/initial.jpg);
+        background-size: cover;
+        background-position: bottom left;
+        & > p {
+            margin: auto;
+            font-weight: bold;
+            color: white;
+        }
+    }
     .discussion-section {
         display: flex;
         height: 75%;
