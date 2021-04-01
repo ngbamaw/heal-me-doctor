@@ -11,13 +11,19 @@ const App = styled.div`
         left: 0;
         z-index: 9999;
         display: flex;
-        background-image: url(http://localhost/imgs/heal-me-doctor/initial.jpg);
+        background-image: url(http://localhost/imgs/heal-me-doctor/initial.jpg); /* props */
         background-size: cover;
-        background-position: bottom left;
-        & > p {
-            margin: auto;
-            font-weight: bold;
-            color: white;
+        background-position: bottom right; /* props */
+        .filter {
+            background: rgba(0, 0, 0, 0.5);
+            height: 100%;
+            width: 100%;
+            display: flex;
+            & > p {
+                margin: auto;
+                font-weight: bold;
+                color: white;
+            }
         }
     }
     .discussion-section {
