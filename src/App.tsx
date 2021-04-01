@@ -1,10 +1,25 @@
 import React from 'react';
 import Style from './style';
 import SendIcon from './assets/send-icon.png';
+import Story from './story.json';
 
 interface Message {
     author: string;
     text: string;
+}
+
+interface StoryStep {
+    type: 'initial' | 'presentation' | 'interaction';
+}
+interface Step {
+    background?: string;
+    timer: number;
+    text: string;
+}
+interface Presentation {
+    background: string;
+    steps: Step[];
+    next: StoryStep;
 }
 
 const ReceiverMessage: React.FC<{ children: string }> = ({ children }) => (
@@ -38,6 +53,23 @@ const App: React.FC = () => {
         },
     ]);
     const [responseWriting, setResponseWriting] = React.useState<boolean>(false);
+    const [stepsPresentation, setStepsPresentation] = React.useState<Step[]>([]);
+
+    const readInital = async (inital: Presentation) => {
+        setStepsPresentation(inital.steps);
+    };
+    const readStory = async (story: any) => {
+        switch (story.type) {
+            case 'initial':
+                await readInital(story);
+                readStory(story.next);
+                break;
+            default:
+                throw new Error('Bad element');
+        }
+    };
+
+    readStory(Story);
 
     return (
         <Style>
@@ -72,6 +104,13 @@ const App: React.FC = () => {
                 >
                     <img src={SendIcon} alt="send" />
                 </button>
+            </div>
+            <div className="presentation-screen">
+                {stepsPresentation.map((step) => (
+                    <div className="filter">
+                        <p>{step.text}</p>
+                    </div>
+                ))}
             </div>
         </Style>
     );
