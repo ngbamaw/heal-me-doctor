@@ -1,0 +1,54 @@
+{
+    "type": "presentation",
+    "steps": [
+        { "text": "Mathias, un jeune homme de 20ans vient de finir sa prépa", "timer": 2000 },
+        { "text": "Il se spécialise en médecine", "timer": 3000 },
+        {
+            "text": "Aujourd'hui, il doit choisir son école pour continuer ses études",
+            "timer": 3000
+        }
+    ],
+    "background": "http://localhost/intial.jpg",
+    "next": {
+        "type": "interaction",
+        "messages": [{ "author": "receiver", "text": "Hello sir" }],
+        "next": [
+            {
+                "label": "Je ne veux pas !!!!",
+                "type": "interaction",
+                "messages": [{ "author": "me", "text": "Hello !!!!" }],
+                "next": {"type": "end"}
+            },
+            {
+                "label": "Transition",
+                "type": "presentation",
+                "steps": [
+                    {
+                        "text": "Noooooooo",
+                        "timer": 1000
+                    },
+                    { "text": "Fallait pas faire ça", "timer": 3000 },
+                    {
+                        "text": "Mortadelleeeeeeeeela",
+                        "timer": 5000
+                    }
+                ]
+            },
+            {
+                "label": "2ème transition",
+                "type": "presentation",
+                "steps": [
+                    {
+                        "text": "Mathias, un jeune homme de 20ans vient de finir sa prépa",
+                        "timer": 5000
+                    },
+                    { "text": "Il se spécialise en médecine", "timer": 3000 },
+                    {
+                        "text": "Aujourd'hui, il doit choisir son école pour continuer ses études",
+                        "timer": 5000
+                    }
+                ]
+            }
+        ]
+    }
+}
