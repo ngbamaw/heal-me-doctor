@@ -23,9 +23,12 @@ const App = styled.div`
                 margin: auto;
                 font-weight: bold;
                 color: white;
+                max-width: 80%;
+                text-align: center;
             }
         }
     }
+
     .discussion-section {
         display: flex;
         height: 75%;
