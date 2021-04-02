@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
 import gsap from 'gsap';
 import Style from './style';
 import SendIcon from './assets/send-icon.png';
@@ -10,9 +10,9 @@ interface Message {
 }
 
 interface StoryStepAbstract {
-    type: 'initial' | 'presentation' | 'interaction';
+    type: 'presentation' | 'interaction' | 'end';
     background: string;
-    next: StoryStep;
+    label?: string;
 }
 interface Step {
     background?: string;
@@ -22,20 +22,21 @@ interface Step {
 
 interface Presentation extends StoryStepAbstract {
     type: 'presentation';
-}
-interface Initial extends StoryStepAbstract {
-    type: 'initial';
+    next: StoryStep;
     steps: Step[];
 }
 
 interface Interaction extends StoryStepAbstract {
     type: 'interaction';
     messages: Message[];
+    next: StoryStep[] | StoryStep;
 }
 
-type StoryStep = Initial | Presentation | Interaction;
+interface End extends StoryStepAbstract {
+    type: 'end';
+}
 
-type StoryStepType = 'initial' | 'presentation' | 'interaction';
+type StoryStep = Presentation | Interaction | End;
 
 const ReceiverMessage: React.FC<{ children: string }> = ({ children }) => (
     <div className="message receiver">
@@ -51,28 +52,13 @@ const MeMessage: React.FC<{ children: string }> = ({ children }) => (
 
 const App: React.FC = () => {
     const [choice, setChoice] = React.useState<number>(-1);
-    const listChoice = ['Good bye', 'Go back', 'Hey !'];
-    const [messageList, setMessageList] = React.useState<Message[]>([
-        { author: 'receiver', text: 'Hello sir' },
-        { author: 'me', text: 'Hello, you' },
-        {
-            author: 'me',
-            text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
-        commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat Lorem
-        ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
-        commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat Lorem
-        ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
-        commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat Lorem
-        ipsum dolor sit amet, consectetur adipiscing elit. Nunc maximus, nulla ut
-        commodo sagittis, sapien dui mattis dui, non pulvinar lorem felis nec erat`,
-        },
-    ]);
+    const [listChoiceHandler, setListChoiceHandler] = React.useState<MouseEventHandler[]>([]);
+    const [listChoice, setListChoice] = React.useState<string[]>([]);
+    const [messageList, setMessageList] = React.useState<Message[]>([]);
     const [responseWriting, setResponseWriting] = React.useState<boolean>(false);
-    const [stepsPresentation, setStepsPresentation] = React.useState<Step[] | null>(null);
-    const [currentStepStoryType, setCurrentStepStoryType] = React.useState<StoryStepType>(
-        'initial',
-    );
     const [currentStep, setCurrentStep] = React.useState<Step | null>(null);
+    const [storyStep, setStoryStep] = React.useState<StoryStep>(Story as StoryStep);
+    const [lockStoryStep, setLockStoryStep] = React.useState<boolean>(false);
     const filterElement = React.useRef<HTMLDivElement>(null);
 
     const timeout = (ms: number) => {
@@ -81,7 +67,6 @@ const App: React.FC = () => {
 
     const changeStep = (nextStep: Step) => {
         const t = gsap.timeline();
-        console.log(currentStep);
         t.to(filterElement.current, { duration: 1, opacity: 0 }).call(() =>
             setCurrentStep(nextStep),
         );
@@ -89,42 +74,57 @@ const App: React.FC = () => {
         t.to(filterElement.current, { duration: 1, opacity: 1 });
     };
 
-    const readInital = React.useCallback(async (inital: Initial) => {
-        setCurrentStep(inital.steps[0]);
-        for (const [index, step] of Object.entries(inital.steps)) {
+    const readInital = React.useCallback(async (presentation: Presentation) => {
+        setCurrentStep(presentation.steps[0]);
+        for (const [index, step] of Object.entries(presentation.steps)) {
             // eslint-disable-next-line no-await-in-loop
             await timeout(step.timer);
-            changeStep(inital.steps[Number(index) + 1]);
+            changeStep(presentation.steps[Number(index) + 1]);
             console.log('update: stepsPresentation');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const readInteraction = React.useCallback(async (interaction: Interaction) => {
-        setMessageList(interaction.messages);
-    }, []);
-    const readStory = React.useCallback(
-        async (story: StoryStep) => {
-            switch (story.type) {
-                case 'initial':
-                    await readInital(story);
-                    readStory(story.next as StoryStep);
-                    break;
-                case 'interaction':
-                    await readInteraction(story);
-                    readStory(story.next as StoryStep);
-                    break;
-                default:
-                    throw new Error('Bad element');
-            }
+    const waitForChoice = async (choices: StoryStep[]) => {
+        setListChoice(choices.map((c) => c.label || 'Nothing'));
+        const promise = new Promise((resolve) => {
+            const responses = choices.map((c) => () => resolve(c));
+            setListChoiceHandler(responses);
+        });
+        return await promise;
+    };
+    const readInteraction = React.useCallback(
+        async (interaction: Interaction) => {
+            setMessageList([...messageList, ...interaction.messages]);
+            if (Array.isArray(interaction.next)) return waitForChoice(interaction.next);
+
+            return interaction.next;
         },
-        [readInital, readInteraction],
+        [messageList],
     );
 
     React.useEffect(() => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        readStory(Story as Initial);
-    }, [readStory]);
+        const readStory = async (story: StoryStep) => {
+            switch (story.type) {
+                case 'presentation':
+                    setLockStoryStep(true);
+                    await readInital(story);
+                    setMessageList([]);
+                    setStoryStep(story.next as StoryStep);
+                    setLockStoryStep(false);
+                    break;
+                case 'interaction':
+                    setLockStoryStep(true);
+                    setStoryStep((await readInteraction(story)) as StoryStep);
+                    setLockStoryStep(false);
+                    break;
+                case 'end':
+                    return;
+                default:
+                    throw new Error('Bad element');
+            }
+        };
+        if (!lockStoryStep) readStory(storyStep);
+    }, [readInital, readInteraction, storyStep, lockStoryStep, messageList]);
 
     return (
         <Style>
@@ -150,13 +150,7 @@ const App: React.FC = () => {
                         </button>
                     ))}
                 </div>
-                <button
-                    className="send-btn"
-                    onClick={() =>
-                        setMessageList([...messageList, { author: 'me', text: listChoice[choice] }])
-                    }
-                    type="button"
-                >
+                <button className="send-btn" onClick={listChoiceHandler[choice]} type="button">
                     <img src={SendIcon} alt="send" />
                 </button>
             </div>
